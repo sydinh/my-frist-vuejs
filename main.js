@@ -1,3 +1,5 @@
+const eventBus = new Vue();
+
 Vue.component("product", {
   props: {
     premium: {
@@ -27,11 +29,11 @@ Vue.component("product", {
         :style="{background: variant.variantColor}"
         @click="updateProduct(index)"
       ></div>
-      <div>Shipping: {{shipping}}</div>
+      <div>Shipping: {{ shipping }}</div>
       <p v-if="inStock">InStock</p>
       <p v-else :class="{'line-through': !inStock}">OutStock</p>
       <ul v-if="details.length">
-        <li v-for="detail in details">{{ detail }}</li>
+        <li v-for="(detail, index) in details" :key="index">{{ detail }}</li>
       </ul>
       <button
         @click="addToCart"
@@ -49,16 +51,7 @@ Vue.component("product", {
         Remove from Cart
       </button>
       <br/>
-      <div>Reviews</div>
-      <p v-if="!reviews.length">There are no reviews yet!</p>
-      <ul v-else>
-        <li v-for="review in reviews">
-          <p>name: {{ review.name }}</p>
-          <p>review: {{ review.review }}</p>
-          <p>rating: {{ review.rating }}</p>
-        </li>
-      </ul>
-      <product-review @review-submited="addReview"></product-review>
+      <product-tab :reviews="reviews"></product-tab>
     </div>
   `,
   data() {
@@ -83,6 +76,7 @@ Vue.component("product", {
       reviews: []
     };
   },
+
   methods: {
     addToCart() {
       this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId);
@@ -95,9 +89,6 @@ Vue.component("product", {
     },
     updateProduct(index) {
       this.selectedVariant = index;
-    },
-    addReview(productReview) {
-      this.reviews.push(productReview);
     }
   },
   computed: {
@@ -114,6 +105,84 @@ Vue.component("product", {
       if (this.premium) return "Free";
       return 2.99;
     }
+  },
+  mounted() {
+    eventBus.$on("review-submited", productReview => {
+      this.reviews.push(productReview);
+    });
+  },
+  created() {
+    console.log("product created");
+  },
+  mounted() {
+    console.log("product mounted");
+  },
+  updated() {
+    console.log("product updated");
+  },
+  destroyed() {
+    console.log("product destroyed");
+  }
+});
+
+Vue.component("product-tab", {
+  props: {
+    reviews: {
+      type: Array,
+      required: true,
+      default: []
+    }
+  },
+  template: `
+    <div class="tabs">
+      <span
+        class="tab"
+        :class="{'active-tab': slectedTab === tab}"
+        v-for="(tab, index) in tabs"
+        :key="index"
+        @click="switchTab(tab)">
+          {{ tab }}
+        </span>
+
+        <div v-show="slectedTab === 'Reviews'">
+          <div>Reviews</div>
+          <p v-if="!reviews.length">There are no reviews yet!</p>
+          <ul v-else>
+            <li v-for="review in reviews">
+              <p>name: {{ review.name }}</p>
+              <p>review: {{ review.review }}</p>
+              <p>rating: {{ review.rating }}</p>
+            </li>
+          </ul>
+        </div>
+
+        <product-review v-show="slectedTab === 'Make a Review'">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque, maiores?
+        </product-review>
+    </div>
+  `,
+  data() {
+    return {
+      tabs: ["Reviews", "Make a Review"],
+      slectedTab: "Reviews"
+    };
+  },
+  methods: {
+    switchTab(tab) {
+      this.slectedTab = tab;
+    }
+  },
+  created() {
+    console.log("product-tab created");
+  },
+  mounted() {
+    console.log("product-tab mounted");
+  },
+  updated() {
+    console.log("product-tab updated");
+  },
+  destroyed() {
+    console.log("product-tab destroyed");
   }
 });
 
@@ -123,12 +192,12 @@ Vue.component("product-review", {
       <div v-if="errors.length">
         Please, correct these errors!
         <ul>
-          <li v-for="error in errors">{{ error }}</li>
+          <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
         </ul>
       </div>
       <form @submit.prevent="onSubmit" @change="onChange">
         <div>
-          <input type="text" v-model="name" />
+          <input type="text" v-model.lazy="name" />
         </div>
         <div>
           <textarea v-model="review" />
@@ -141,6 +210,7 @@ Vue.component("product-review", {
           </select>
         </div>
         <button type="submit">Review Submit</button>
+        <slot></slot>
       </form>
     </div>
   `,
@@ -153,7 +223,8 @@ Vue.component("product-review", {
     };
   },
   methods: {
-    onChange() {
+    onChange(event) {
+      console.log("event: ", event);
       if (this.errors.length) {
         this.errors.length = 0;
       }
@@ -165,7 +236,7 @@ Vue.component("product-review", {
           review: this.review,
           rating: this.rating
         };
-        this.$emit("review-submited", productReview);
+        eventBus.$emit("review-submited", productReview);
         this.name = null;
         this.review = null;
         this.rating = null;
@@ -180,6 +251,18 @@ Vue.component("product-review", {
     isInvalid() {
       return !this.name || !this.review || !this.rating;
     }
+  },
+  created() {
+    console.log("product-review created");
+  },
+  mounted() {
+    console.log("product-review mounted");
+  },
+  updated() {
+    console.log("product-review updated");
+  },
+  destroyed() {
+    console.log("product-review destroyed");
   }
 });
 
@@ -200,5 +283,17 @@ const app = new Vue({
         this.cart.splice(index, 1);
       }
     }
+  },
+  created() {
+    console.log("app created");
+  },
+  mounted() {
+    console.log("app mounted");
+  },
+  updated() {
+    console.log("app updated");
+  },
+  destroyed() {
+    console.log("app destroyed");
   }
 });
