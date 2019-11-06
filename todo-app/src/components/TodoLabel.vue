@@ -2,6 +2,7 @@
   <div class="todo-label">
     <p>Completed Tasks: {{ completedTasks }}</p>
     <p>Pending Tasks: {{ pendingTasks }}</p>
+    <slot></slot>
   </div>
 </template>
 

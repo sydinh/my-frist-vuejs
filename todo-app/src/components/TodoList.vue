@@ -1,6 +1,8 @@
 <template>
   <div class="todo-list">
-    <todo-label v-bind:todos="todos"></todo-label>
+    <todo-label v-bind:todos="todos">
+      <div style="margin: 10px 0 0">I am Slot</div>
+    </todo-label>
     <todo
       v-for="todo in todos"
       v-bind:key="todo.id"
@@ -12,8 +14,8 @@
 </template>
 
 <script>
-import TodoLabel from './TodoLabel';
-import Todo from './Todo';
+import TodoLabel from './TodoLabel'
+import Todo from './Todo'
 
 export default {
   props: ['todos'],

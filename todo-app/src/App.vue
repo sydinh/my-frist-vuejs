@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import TodoList from './components/TodoList';
-import TodoCreate from './components/TodoCreate';
+import TodoList from './components/TodoList'
+import TodoCreate from './components/TodoCreate'
 
 export default {
   name: 'App',
